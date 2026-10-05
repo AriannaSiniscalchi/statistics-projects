@@ -1,0 +1,264 @@
+---
+title: "Esercitazione Variabili Casuali Discrete"
+author: "Arianna Siniscalchi"
+date: "2026-05-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### ESERCIZIO 1
+Tu e i tuoi 7 amici (8 in tutto) avete deciso di comprare i biglietti del volo Milano - Los Angeles dove avete deciso di passare le vacanze estive. Siete fortunati perché la compagnia American Airlines a mezzanotte lancerà degli sconti incredibili, tuttavia ognuno può comprare uno e un solo biglietto. Decidendo di collegarvi a mezzanotte, si sa che la probabilità stimata di riuscire ad acquistare un biglietto è pari a 0.14. 
+
+1. La situazione sopra descritta può essere rappresentata da una variabile casuale? Se sì, quale e perché?
+2.  Qual è la probabilità che solo due di voi riescano a partire? 
+3. Qual è la probabilità che a partire siate un numero compreso tra 4 e 6?
+4. Calcolare media e varianza della variabile casuale che si comporta come la situazione descritta sopra.
+5. Si sà che 1000 persone stanotte hanno tentato di acquistare il biglietto (sempre con una probabilità di 0.14). Qual è la probabilità che esattamente 135 persone siano riuscite ad acquistare il biglietto? E che ci siano riuscite in "almeno" 135?
+
+#### Soluzioni:
+
+2. Qual è la probabilità che solo due tra i tuoi amici (tu compreso) riescano a partire? 
+```{r}
+n <- 8
+p <- 0.14
+dbinom(2, size = n, prob = p)
+```
+3. Qual è la probabilità che partano dai 4 ai 6 amici (tu compreso)?
+
+```{r}
+sum(dbinom(4:6, size = n, prob = p))
+```
+4. Calcolare media e varianza della variabile casuale che si comporta come la situazione descritta sopra.
+
+```{r}
+media <- n * p
+varianza <- n * p * (1 - p)
+media
+varianza
+```
+5. Consideriamo ora che siano stati in 1000 le persone che stanotte hanno tentato di acquistare il biglietto (sempre con una probabilità di 0.14). Qual è la probabilità che esattamente 135 persone siano riuscite ad acquistare il biglietto? E che siano riuscite in almeno 135?
+
+Si suppone di poter utilizzare l'approssimazione di Poisson:
+
+```{r}
+n_nuovo <- 1000
+lambda <- n_nuovo * p 
+dpois(135, lambda = lambda)       # Esattamente 135
+1 - ppois(134, lambda = lambda)    # Almeno 135
+```
+
+
+### ESERCIZIO 2
+
+In un laboratorio di produzione di bottoni, si sa che ogni 1000 bottoni prodotti 200 sono difettosi. 
+
+1. Considerando una produzione, qual è la probabilità che il secondo bottone prodotto controllato sia il primo identificato come difettoso?
+2. qual è la probabilità che i primi 4 bottoni controllati non siano difettosi? 
+3. Inoltre, nella produzione, qual è la media di bottoni che bisogna controllare prima di trovarne uno difettoso? 
+4. e la varianza di questa variabile casuale? 
+5.	Qual è la probabilità che servano almeno 10 bottoni per ottenerne 4 difettosi?
+6.	Qual è il numero di bottoni da controllare in modo da ottenerne 4 difettosi con probabilità pari a 0.80?
+
+#### Soluzioni:
+
+1. Considerando una produzione, qual è la probabilità che il secondo bottone prodotto controllato sia il primo identificato come difettoso?
+$p(X) = p (1-p)^{x-1}$
+```{r}
+p_dif <- 200 / 1000 
+dgeom(x = 2 - 1, prob = p_dif)
+```
+2. qual è la probabilità che i primi 4 bottoni controllati non siano difettosi? 
+
+Probabilità che i primi 4 bottoni non siano difettosi, cioè che il primo difettoso sia il quinto o successivo
+```{r}
+1 - pgeom(q = 4 - 1, prob = p_dif)
+```
+
+3. Inoltre, nella produzione, qual è la media di bottoni che bisogna controllare prima di trovarne uno difettoso? 
+
+```{r}
+1 / p_dif
+```
+
+4. e la varianza di questa variabile casuale? 
+
+```{r}
+(1 - p_dif) / (p_dif^2)
+```
+
+5.	Qual è la probabilità che servano almeno 10 bottoni per ottenerne 4 difettosi?
+
+```{r}
+k <- 4
+1 - pnbinom(q = 9 - k, size = k, prob = p_dif)
+```
+
+6.	Qual è il numero di bottoni da controllare in modo da ottenerne 4 difettosi con probabilità pari a 0.80?
+
+```{r}
+insuccessi <- qnbinom(p = 0.80, size = 4, prob = p_dif)
+insuccessi + 4
+```
+
+
+### ESERCIZIO 3	
+In un centralino si sa che il numero di chiamate telefoniche che arrivano durante ogni periodo di 10 minuti distribuito come un numero aleatorio con distribuzione di Poisson di parametro $\lambda = 2$. 
+
+1. Calcolare la probabilità che arrivino tre chiamate in 10 minuti. 
+2. Calcolare le probabilità che più di tre chiamate arrivino in un periodo di 10 minuti. 
+3. Calcolare la probabilità che non arrivi nessuna chiamata nell'arco di 30 minuti 
+4. Calcolare la probabilità che arrivino 100 chiamate durante una giornata lavorativa completa 6 ore di lavoro. 
+5. Calcolare media e varianza della variabile casuale che descrive il fenomeno.  
+
+#### Soluzioni:
+1. Calcolare la probabilità che arrivino tre chiamate in 10 minuti. 
+```{r}
+dpois(3, lambda = 2)
+```
+2. Calcolare le probabilità che più di tre chiamate arrivino in un periodo di 10 minuti. 
+
+```{r}
+1 - ppois(3, lambda = 2)
+```
+
+3. Calcolare la probabilità che non arrivi nessuna chiamata nell'arco di 30 minuti 
+```{r}
+dpois(0, lambda = 6)
+```
+
+4. Calcolare la probabilità che arrivino 100 chiamate durante una giornata lavorativa completa 6 ore di lavoro. 
+```{r}
+dpois(100, lambda = 72)
+```
+
+5. Calcolare media e varianza della variabile casuale che descrive il fenomeno.  
+
+```{r}
+lambda_base <- 2
+media_pois <- lambda_base
+varianza_pois <- lambda_base
+media_pois
+varianza_pois
+```
+
+
+
+### ESERCIZIO 4 
+Supponiamo di comprare 5 biglietti della lotteria per l'estrazione a sorte di 3 premi su un totale di 50 biglietti e che l'estrazione dei premi avvenga in blocco (senza reinserimento). 
+
+1. Quale modello probabilistico può essere utilizzato per descrivere la variabile casuale X= numero di premi vinti? 
+2. Calcolare valore atteso e varianza della variabile casuale sopra descritta
+3. Calcolare la probabilità di vincere un premio
+4. Calcolare la probabilità di vincere tutti e 3 i premi
+5. Calcolare la probabilità di vincere 4 premi
+
+#### Soluzioni:
+
+1. Quale modello probabilistico può essere utilizzato per descrivere la variabile casuale X= numero di premi vinti? 
+
+2. Calcolare valore atteso e varianza della variabile casuale sopra descritta.
+
+```{r}
+N <- 50   
+K <- 3    
+n <- 5    
+E_X <- n * (K / N)
+Var_X <- n * (K / N) * (1 - K / N) * ((N - n) / (N - 1))
+E_X
+Var_X
+```
+3. Calcolare la probabilità di vincere un premio
+
+```{r}
+dhyper(x = 1, m = K, n = N - K, k = n)
+```
+
+
+4. Calcolare la probabilità di vincere tutti e 3 i premi
+
+```{r}
+dhyper(x = 3, m = K, n = N - K, k = n)
+```
+
+
+5. Calcolare la probabilità di vincere 4 premi
+
+```{r}
+dhyper(x = 4, m = K, n = N - K, k = n)
+
+```
+
+
+### ESERCIZIO 5 
+
+In un'azienda, si sta esaminando la qualità di un lotto di 500 pezzi di un componente elettronico. Si sa che all'interno di questo lotto ci sono 50 componenti difettosi. Per controllare la qualità del lotto, viene estratto un campione di 25 componenti senza reinserimento.
+
+Si vuole stimare la probabilità 
+
+1.A che tipo di processo aleatorio ci stiamo riferendo?
+2. Calcolare la probabilità di trovare esattamente 3 componenti difettosi nel campione estratto
+3. Calcolare la stessa probabilità utilizzando una approssimazione binomiale
+4. Calcolare la probabilità che il numero di componenti difettose nel campione sia maggiore di 3 (utilizzando la binomiale, se l’approssimazione è buona, e la ipergeometrica se l’approssimazione non è buona) P.S. Per buona si intende $ (| P_h - P_b | / P_h)*100 < 1$
+
+#### Soluzioni:
+
+2. Calcolare la probabilità di trovare esattamente 3 componenti difettosi nel campione estratto
+```{r}
+N_tot <- 500
+K_def <- 50
+n_camp <- 25
+P_h <- dhyper(x = 3, m = K_def, n = N_tot - K_def, k = n_camp)
+P_h
+```
+3. Calcolare la stessa probabilità utilizzando una approssimazione binomiale
+
+```{r}
+p_succ <- K_def / N_tot 
+P_b <- dbinom(3, size = n_camp, prob = p_succ)
+P_b
+```
+
+4. Calcolare la probabilità che il numero di componenti difettose nel campione sia maggiore di 3 (utilizzando la binomiale, se l’approssimazione è buona, e la ipergeometrica se l’approssimazione non è buona) P.S. Per buona si intende $ (| P_h - P_b | / P_h)*100 < 1$
+
+```{r}
+errore_percentuale <- (abs(P_h - P_b) / P_h) * 100
+
+if (errore_percentuale < 1) {
+  1 - pbinom(3, size = n_camp, prob = p_succ)
+} else {
+  1 - phyper(3, m = K_def, n = N_tot - K_def, k = n_camp)
+}
+```
+
+### ESERCIZIO 6
+
+In un negozio, il tempo di attesa medio tra l'arrivo di un cliente e il successivo è di 20 minuti.
+Qual è la probabilità che in un ora arrivino in negozio un numero di clienti superiore o uguale a 4?
+
+```{r}
+lambda_ora <- 60 / 20
+1 - ppois(3, lambda = lambda_ora)
+```
+
+### ESERCIZIO 7
+
+Sulla base dei sui lanci in carriera, la probabilità di un famoso lanciatore di freccette di fare un lancio da 20 punti (il massimo) è di 0.32
+
+a.	Il lancio di 3 freccette consecutive nell’area dei 20 punti è chiamata “triplo 20” e vale 180 punti. Qual è la probabilità che, dati 3 lanci consecutivi e indipendenti, tutti e tre siano da 20 punti? (ossia, qual è la probabilità di fare un triplo 20?)
+
+```{r}
+p_20 <- 0.32
+p_triplo20 <- p_20^3
+p_triplo20
+```
+
+b.	Si supponga che una gara sia composta dal lancio di 10 volte 3 freccette. Qual è la probabilità che in questa gara il famoso lanciatore riesca ad eseguire almeno 2 “tripli 20”?
+
+```{r}
+n_gare <- 10
+1 - pbinom(1, size = n_gare, prob = p_triplo20)
+```
+
