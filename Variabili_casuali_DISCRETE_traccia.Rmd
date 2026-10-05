@@ -19,6 +19,8 @@ Tu e i tuoi 7 amici (8 in tutto) avete deciso di comprare i biglietti del volo M
 5. Si sà che 1000 persone stanotte hanno tentato di acquistare il biglietto (sempre con una probabilità di 0.14). Qual è la probabilità che esattamente 135 persone siano riuscite ad acquistare il biglietto? E che ci siano riuscite in "almeno" 135?
 
 #### Soluzioni:
+1. La situazione sopra descritta può essere rappresentata da una variabile casuale? Se sì, quale e perché?
+Sì, una variabile casuale binomiale
 
 2. Qual è la probabilità che solo due tra i tuoi amici (tu compreso) riescano a partire? 
 ```{r}
