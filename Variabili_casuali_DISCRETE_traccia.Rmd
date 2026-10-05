@@ -179,6 +179,7 @@ Var_X
 
 ```{r}
 dhyper(x = 1, m = K, n = N - K, k = n)
+choose(3, 1) * choose(47, 4) / choose(50, 5)
 ```
 
 
