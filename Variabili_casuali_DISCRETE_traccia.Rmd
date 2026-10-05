@@ -26,12 +26,15 @@ Sì, una variabile casuale binomiale
 ```{r}
 n <- 8
 p <- 0.14
-dbinom(2, size = n, prob = p)
+x <- 2
+dbinom(x, n, p)
 ```
 3. Qual è la probabilità che partano dai 4 ai 6 amici (tu compreso)?
 
 ```{r}
-sum(dbinom(4:6, size = n, prob = p))
+sum(dbinom(4:6, n, p))
+dbinom(4, n, p) + dbinom(5, n, p) + dbinom(6, n, p)
+pbinom(6, n, p) - pbinom(3, n, p)
 ```
 4. Calcolare media e varianza della variabile casuale che si comporta come la situazione descritta sopra.
 
