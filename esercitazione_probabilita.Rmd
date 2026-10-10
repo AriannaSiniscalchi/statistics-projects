@@ -1,0 +1,473 @@
+---
+title: "Probabilità ed enumerazione punti campionari"
+author: "Arianna Sinisscalchi"
+date: "21/09/2026"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### ESERCIZIO 1	
+
+Si consideri lo spazio campionario S e gli eventi A, B, C:
+
+$\Omega$ = S = {rame, sodio, azoto, potassio, uranio, ossigeno, zinco}
+
+A = {rame, sodio, zinco}
+
+B = {sodio, azoto, potassio}
+
+C = {ossigeno}
+
+#### Quesiti:
+1. $A’$ = complementare di A
+2. $A \cup B$
+3. $(A \cap B') \cup C’$
+4. $B’ \cap C’$
+5. $A \cap B \cap C$
+6. $(A' \cup B') \cap (A'\cap C)$
+7. $(A \cap B)'$
+8. $(A\cup B)’$
+9. $(A \cap C) \cup B$
+
+
+```{r}
+S <- c("rame", "sodio", "azoto", "potassio", "uranio", "ossigeno", "zinco")
+A <- c("rame", "sodio", "zinco")
+B <- c("sodio", "azoto", "potassio")
+C <- c("ossigeno")
+```
+
+### Soluzioni:
+1. $A’$ = complementare di A
+
+```{r}
+setdiff(S, A)
+```
+
+2. $A \cup B$
+
+```{r}
+union(A, B)
+```
+
+3. $(A \cap B') \cup C’$
+
+```{r}
+B_comp <- setdiff(S, B)
+C_comp <- setdiff(S, C)
+union(intersect(A, B_comp), C_comp)
+```
+
+4. $B’ \cap C’$
+
+```{r}
+intersect(setdiff(S, B), setdiff(S, C))
+```
+
+5. $A \cap B \cap C$
+
+```{r}
+intersect(intersect(A, B), C)
+```
+
+6. $(A' \cup B') \cap (A'\cap C)$
+
+```{r}
+A_comp <- setdiff(S, A)
+union_A_B_comp <- union(A_comp, setdiff(S, B))
+inter_A_C <- intersect(A_comp, C)
+intersect(union_A_B_comp, inter_A_C)
+```
+
+7. $(A \cap B)'$
+
+```{r}
+setdiff(S, intersect(A, B))
+```
+
+8. $(A\cup B)’$
+
+```{r}
+setdiff(S, union(A, B))
+```
+
+9. $(A \cap C) \cup B$
+
+```{r}
+union(intersect(A, C), B)
+```
+
+
+### ESERCIZIO 2
+
+I dati si riferiscono ai passeggeri nazionali e internazionali registrati nel mese di gennaio 2018 per 29 distinti aeoporti, classificati per area terriroriale e classi di numero di passeggeri.
+
+# Define the data frame
+```{r}
+data <- data.frame(
+  id = 1:29,
+  Aeroporto = c(
+    "Alghero", "Ancona", "Bari", "Bergamo", "Bologna", "Brindisi",
+    "Cagliari", "Catania", "Comiso", "Cuneo", "Firenze", "Genova",
+    "Lamezia Terme", "Milano Linate", "Milano Malpensa", "Napoli", 
+    "Olbia", "Palermo", "Perugia", "Pescara", "Pisa", "Roma Ciampino",
+    "Roma Fiumicino", "Torino", "Trapani", "Treviso", "Trieste", 
+    "Venezia", "Verona"
+  ),
+  `Area geografica italiana` = c(
+    "SUD + ISOLE", "CENTRO", "SUD + ISOLE", "NORD", "NORD", "SUD + ISOLE",
+    "SUD + ISOLE", "SUD + ISOLE", "SUD + ISOLE", "NORD", "CENTRO", "NORD",
+    "SUD + ISOLE", "NORD", "NORD", "SUD + ISOLE", "SUD + ISOLE", "SUD + ISOLE",
+    "CENTRO", "SUD + ISOLE", "CENTRO", "CENTRO", "CENTRO", "NORD", "SUD + ISOLE",
+    "NORD", "NORD", "NORD", "NORD"
+  ),
+  Nazionali = c(
+    49157, 2431, 204374, 233682, 148827, 121782, 199111, 431976, 18919,
+    4259, 27143, 46573, 135603, 354930, 207705, 240847, 47554, 321676,
+    3488, 21452, 104619, 21434, 775352, 134661, 35272, 90068, 34526,
+    72638, 61838
+  ),
+  Internazionali = c(
+    4099, 19121, 111067, 698658, 449445, 19558, 31699, 121057, 7832, 
+    4634, 143854, 26969, 15197, 313188, 1382658, 289524, 3505, 52099,
+    9977, 19093, 171499, 442822, 1849908, 183767, 6222, 158132, 14954,
+    492953, 129284
+  )
+)
+
+# Definisci i limiti delle classi
+class_limits <- c(0, 10000, 150000, Inf)
+
+data$Classe <- cut(data$Internazionali, breaks = class_limits, labels = c("A", "B", "C"))
+
+data$Classe
+
+data
+
+```
+
+Di seguito, la distribuzione congiunta tra passeggeri internazionali in classi e area geografica.
+
+| Area geografica  | A | B | C | Totale complessivo |
+|:------------------|-:|:-:|:-:|:-:|---------------------:|
+| CENTRO           |                        1 | 2 | 3 |                    6 |
+| NORD             |                        1 | 3 | 7 |                   11 |
+| SUD + ISOLE      |                        4 | 7 | 1 |                   12 |
+| Totale complessivo |                     6 | 12 | 11 |                   29 |
+
+
+### Quesiti:
+1.	Se viene estratto a caso un aeroporto, qual è la probabilità che si trovi nel Nord Italia?
+2.	Se viene estratto a caso un aeroporto, qual è la probabilità che si trovi nel Nord Italia e abbia più di 150 passeggeri transitati?
+3.	Se viene estratto a caso un aeroporto, qual è la probabilità che non si trovi nel Nord Italia e abbia almeno 10 passeggeri transitati?
+4.	Se viene estratto a caso un aeroporto, qual è la probabilità che non si trovi nel Nord Italia o abbia meno di 10 passeggeri transitati?
+5.	Se viene estratto a caso un aeroporto del Nord Italia, qual è la probabilità che abbia avuto più di 150 passeggeri transitati?
+6.	Se vengono estratti a caso (con reiserimento) tre aereoporti, qual è la probabilità che solo il secondo sia nel Centro Italia?
+7.	Se vengono estratti senza reiserimento tre aereoporti, qual è la probabilità che solo il secondo sia nel Centro Italia?
+
+### Soluzioni:
+
+1. Se viene estratto a caso un aeroporto, qual è la probabilità che si trovi nel Nord Italia?
+
+
+```{r}
+sum(data$`Area geografica italiana` == "NORD") / nrow(data)
+
+```
+2.	Se viene estratto a caso un aeroporto, qual è la probabilità che si trovi nel Nord Italia e abbia più di 150 mila passeggeri transitati?
+
+
+```{r}
+sum(data$`Area geografica italiana` == "NORD" & data$Classe == "C") / nrow(data)
+
+```
+
+
+3.	Se viene estratto a caso un aeroporto, qual è la probabilità che non si trovi nel Nord Italia e abbia almeno 10 mila passeggeri transitati?
+
+```{r}
+sum(data$`Area geografica italiana` != "NORD" & data$Classe %in% c("B", "C")) / nrow(data)
+
+```
+
+4.	Se viene estratto a caso un aeroporto, qual è la probabilità che non si trovi nel Nord Italia o abbia meno di 10 passeggeri transitati?
+
+
+```{r}
+sum(data$`Area geografica italiana` != "NORD" | data$Classe == "A") / nrow(data)
+```
+
+5.	Se viene estratto a caso un aeroporto del Nord Italia, qual è la probabilità che abbia avuto più di 150 mila passeggeri transitati?
+
+
+```{r}
+sum(data$`Area geografica italiana` == "NORD" & data$Classe == "C") / sum(data$`Area geografica italiana` == "NORD")
+```
+
+6.	Se vengono estratti a caso (con reinserimento) tre aereoporti, qual è la probabilità che solo il secondo sia nel Centro Italia?
+
+Sono estrazioni INDIPENDENTI
+
+```{r}
+p_centro <- sum(data$`Area geografica italiana` == "CENTRO") / nrow(data)
+p_non_centro <- 1 - p_centro
+
+p_non_centro * p_centro * p_non_centro
+```
+
+
+7.	Se vengono estratti senza reiserimento tre aereoporti, qual è la probabilità che solo il secondo sia nel Centro Italia?
+
+i.e., Sono estrazioni DIPENDENTI:
+
+```{r}
+n_tot <- nrow(data)
+n_centro <- sum(data$`Area geografica italiana` == "CENTRO")
+n_non_centro <- n_tot - n_centro
+
+(n_non_centro / n_tot) * (n_centro / (n_tot - 1)) * ((n_non_centro - 1) / (n_tot - 2))
+```
+
+
+
+### ESERCIZIO 3 (2.17 libro di testo + aggiunta)	
+Un test a scelta multipla è composto da 5 domande, ciascuna con 4 possibili risposte di cui 1 sola corretta
+
+#### Quesiti:
+1.	Quanti modi diversi ci sono di scegliere una risposta per ogni domanda?
+2.	Quanti modi diversi ci sono di scegliere una risposta sbagliata per ogni domanda?
+3.  A quanto ammonta la probabilità di sbagliare tutte le domande, se il candidato sceglie le risposte a caso?
+4. A quanto ammonta la probabilità di superare il test scegliendo le risposte a caso, se il test è superato con almeno tre risposte corrette su 5?
+
+#### Soluzioni:
+1. Quanti modi diversi ci sono di scegliere una risposta per ogni domanda?
+```{r}
+4^5
+
+```
+2. Quanti modi diversi ci sono di scegliere una risposta sbagliata per ogni domanda?
+```{r}
+3^5
+```
+3. A quanto ammonta la probabilità di sbagliare tutte le domande, se il candidato sceglie le risposte a caso?
+```{r}
+(3/4)^5
+```
+
+4. A quanto ammonta la probabilità di superare il test scegliendo le risposte a caso, se il test è superato con almeno 3 risposte corrette su 5?
+```{r}
+pbinom(2, size = 5, prob = 0.25, lower.tail = FALSE)
+
+```
+
+### ESERCIZIO 4 (2.24 libro di testo)	
+
+#### Quesiti:
+1.	Quanti modi ci sono di selezionare 3 candidati per un lavoro, considerando una rosa da 8 candidati neo-laureati? 
+2.	Quanti modi ci sono di selezionare 3 candidati per un lavoro, di cui 2 maschi e 1 femmina, considerando una rosa da 8 candidati neo-laureati (4 maschi e 4 femmine)? 
+
+#### Soluzioni:
+1. Quanti modi ci sono di selezionare 3 candidati per un lavoro, considerando una rosa da 8 candidati neo-laureati? 
+```{r}
+choose(8, 3)
+```
+2.	Quanti modi ci sono di selezionare 3 candidati per un lavoro, di cui 2 maschi e 1 femmina, considerando una rosa da 8 candidati neo-laureati (4 maschi e 4 femmine)? 
+```{r}
+choose(4, 2) * choose(4, 1)
+```
+### ESERCIZIO 5 (2.42 libro di testo)	
+Un veicolo giunge alle grotte di Luray negli Stati Uniti. La probabilità che sia di targa canadese è 0.12, che sia un camper 0.28, che sia un camper canadese 0.09
+
+#### Quesiti:
+1.	Qual è la probabilità che, dato che questo veicolo è un camper, abbia targa canadese?
+2.	Qual è la probabilità che, dato che questo veicolo è di targa canadese, sia un camper?
+3.	Qual è la probabilità che non sia camper oppure non sia canadese?
+
+
+Prima di rispondere proviamo a ricostruire tutta la tabella:
+
+|               | Canadese | Non canadese | Marginali |
+|---------------|----------|--------------|-----------|
+| Camper        |   0.09   |              |   0.28    |
+| Non camper    |          |              |           |
+| Marginali     |   0.12   |              |     1     |
+
+
+```{r}
+p_canadese <- 0.12
+p_camper <- 0.28
+p_camper_canadese <- 0.09
+
+# Ricostruzione della tabella
+tabella <- matrix(c(0.09, 0.19, 0.03, 0.69), nrow = 2, byrow = TRUE)
+rownames(tabella) <- c("Camper", "Non camper")
+colnames(tabella) <- c("Canadese", "Non canadese")
+tabella
+```
+
+
+
+1. Qual è la probabilità che, dato che questo veicolo è un camper, abbia targa canadese?
+
+```{r}
+p_camper_canadese / p_camper
+```
+2. Qual è la probabilità che, dato che questo veicolo è di targa canadese, sia un camper?
+
+
+```{r}
+p_camper_canadese / p_canadese
+
+```
+			
+3.	Qual è la probabilità che non sia camper oppure non sia canadese?		
+
+```{r}
+1 - p_camper_canadese
+```
+
+### ESERCIZIO 6	
+In un gioco di carte, avente un mazzo da 40, se si estrae l'asso si vincono 30 euro, se si estrae una figura si vincono 12 euro mentre in tutti gli altri casi si devono pagare 14 euro. Calcolare la speranza matematica di guadagno.
+
+#### Quesiti:
+1.	Calcolare la probabilità che esca un asso oppure una carta di denari
+2.	Calcolare la speranza matematica di guadagno
+3.	Calcolare la speranza matematica di guadagno se anche l'uscita del 3 è vincente (15 euro)
+
+#### Soluzioni:
+1.	Calcolare la probabilità che esca un asso oppure una carta di denari:
+
+
+```{r}
+(4/40) + (10/40) - (1/40)
+```
+
+2.	Calcolare la speranza matematica di guadagno
+
+```{r}
+p_asso <- 4/40
+p_figura <- 12/40
+p_altro <- 24/40
+
+30 * p_asso + 12 * p_figura + (-14) * p_altro
+```
+
+3.	Calcolare la speranza matematica di guadagno se anche l'uscita del 3 è vincente (15 euro)
+
+```{r}
+p_tre <- 4/40
+p_altro_nuovo <- 20/40
+
+30 * p_asso + 12 * p_figura + 15 * p_tre + (-14) * p_altro_nuovo
+
+```
+
+### ESERCIZIO 7
+Date due urne, la prima contiene 3 palline bianche e 2 rosse mentre la seconda 2 bianche e 4 rosse. Se l’estrazione casuale delle due urne è equiprobabile: 
+
+#### Quesiti:
+1.	Qual è la probabilità di estrarre una pallina bianca da una delle due urne?
+2.	Qual è la probabilità di estrarre una pallina rossa da una delle due urne?
+3.	Qual è la probabiltà di estrarre senza reintroduzione 3 palline rosse dalla prima urna?
+
+#### Soluzioni:
+1.	Qual è la probabilità di estrarre una pallina bianca da una delle due urne?
+
+Devo calcolare la probabilità per ognuna delle due urne, come rapporto tra combinazioni, poi fare la media delle due probabilità	
+
+```{r}
+p_u1 <- 0.5
+p_u2 <- 0.5
+
+p_b_u1 <- 3 / 5
+p_b_u2 <- 2 / 6
+
+p_bianca <- p_u1 * p_b_u1 + p_u2 * p_b_u2
+p_bianca
+```
+
+2. Qual è la probabilità di estrarre una pallina rossa da una delle due urne?
+
+```{r}
+1 - p_bianca
+
+```
+
+3. Qual è la probabilità di estrarre senza reintroduzione 3 palline rosse dalla prima urna?
+
+```{r}
+# Nella prima urna ci sono solo 2 palline rosse, quindi la probabilità di estrarne 3 è 0
+choose(2, 3) / choose(5, 3)
+```
+
+### ESERCIZIO 8
+Presso un'impresa di costruzioni lavorano 3 ingegneri. L'ingegnere A stima i costi per il 50% dei progetti, l'ingegnere B per il 30% e l'ingegnere C per il 20%. E' noto che il tasso di errore nello stimare i costi è pari a 0,02 per A, 0,01 per B e 0,06 per C.
+
+#### Quesiti:
+1.	Calcolare la probabilità che un progetto contenga un errore nella stima dei costi.
+2.	Se un progetto contiene un errore nella stima dei costi, quale è la probabilità che questo sia stato preparato dall'ingegnere C?
+3.	L'impresa decide di non assegnare la preparazione di progetti all'ingegnere C dato che il suo tasso di errore è ritenuto troppo elevato. Come variano le due probabilità precedentemente calcolate? 
+4.	Escluso C, quale sarà la probabilità che un progetto sia stato preparato dall'ingegnere A, dato che questo non contiene un errore?
+
+```{r}
+p_A <- 0.50
+p_B <- 0.30
+p_C <- 0.20
+
+p_Err_A <- 0.02
+p_Err_B <- 0.01
+p_Err_C <- 0.06
+```
+
+#### Soluzioni:
+1.	Calcolare la probabilità che un progetto contenga un errore nella stima dei costi.
+
+$p(Err) = p(Err|A) * p(A) + p(Err|B)*p(B) + p(Err|C) * p(C)$
+
+```{r}
+p_Err <- p_Err_A * p_A + p_Err_B * p_B + p_Err_C * p_C
+p_Err
+```
+2.	Se un progetto contiene un errore nella stima dei costi, quale è la probabilità che questo sia stato preparato dall'ingegnere C?
+
+
+```{r}
+p_C_dato_Err <- (p_Err_C * p_C) / p_Err
+p_C_dato_Err
+
+
+```
+
+3.	L'impresa decide di non assegnare la preparazione di progetti all'ingegnere C dato che il suo tasso di errore è ritenuto troppo elevato. Come variano le due probabilità precedentemente calcolate? 
+
+	
+
+```{r}
+p_A_nuovo <- 0.50 / (0.50 + 0.30)
+p_B_nuovo <- 0.30 / (0.50 + 0.30)
+
+p_Err_nuovo <- p_Err_A * p_A_nuovo + p_Err_B * p_B_nuovo
+p_Err_nuovo
+
+p_C_dato_Err_nuovo <- 0
+p_C_dato_Err_nuovo
+
+```
+
+4.	Escluso C, quale sarà la probabilità che un progetto sia stato preparato dall'ingegnere A, dato che questo non contiene un errore?
+
+
+
+```{r}
+p_NoErr_A <- 1 - p_Err_A
+p_NoErr_B <- 1 - p_Err_B
+
+p_NoErr_nuovo <- p_NoErr_A * p_A_nuovo + p_NoErr_B * p_B_nuovo
+
+(p_NoErr_A * p_A_nuovo) / p_NoErr_nuovo
+
+```
